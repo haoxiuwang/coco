@@ -8,10 +8,10 @@ struct FloatingAvatarApp: App {
         WindowGroup {
             AvatarView(model: model)
                 .onAppear {
-                    FloatingWindowManager.shared.setupWindow(rootView: AvatarView(model: model),
-                                                             alwaysOnTop: model.alwaysOnTop)
+                    // 配置窗口（无边框、透明、置顶等）
+                    FloatingWindowManager.shared.setupWindow(alwaysOnTop: model.alwaysOnTop)
                 }
         }
-        .windowStyle(HiddenTitleBarWindowStyle())
+        .windowStyle(HiddenTitleBarWindowStyle()) // 去标题栏
     }
 }

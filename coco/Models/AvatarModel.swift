@@ -1,13 +1,13 @@
 import SwiftUI
 import AppKit
 
-class AvatarModel: ObservableObject {
+final class AvatarModel: ObservableObject {
     @Published var avatars: [NSImage?] = Array(repeating: nil, count: 4)
+
     @Published var currentIndex: Int = UserDefaults.standard.integer(forKey: "floating.currentIndex") {
-        didSet {
-            UserDefaults.standard.set(currentIndex, forKey: "floating.currentIndex")
-        }
+        didSet { UserDefaults.standard.set(currentIndex, forKey: "floating.currentIndex") }
     }
+
     @Published var alwaysOnTop: Bool = UserDefaults.standard.bool(forKey: "floating.alwaysOnTop") {
         didSet {
             UserDefaults.standard.set(alwaysOnTop, forKey: "floating.alwaysOnTop")
@@ -16,10 +16,10 @@ class AvatarModel: ObservableObject {
     }
 
     private let avatarDir: URL
+    private let fm = FileManager.default
 
     init() {
-        // 创建 Application Support/FloatingAvatar/avatars
-        let fm = FileManager.default
+        // ~/Library/Application Support/FloatingAvatar/avatars
         let appSupport = fm.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
         let appFolder = appSupport.appendingPathComponent("FloatingAvatar", isDirectory: true)
         if !fm.fileExists(atPath: appFolder.path) {
@@ -30,23 +30,40 @@ class AvatarModel: ObservableObject {
             try? fm.createDirectory(at: avatarDir, withIntermediateDirectories: true)
         }
 
-        // 加载本地存储头像
+        // 启动时从沙盒加载 4 张头像
         for i in 0..<4 {
-            let fileURL = avatarDir.appendingPathComponent("avatar\(i).png")
-            if fm.fileExists(atPath: fileURL.path), let img = NSImage(contentsOf: fileURL) {
+            let url = avatarURL(index: i)
+            if fm.fileExists(atPath: url.path),
+               let img = NSImage(contentsOf: url) {
                 avatars[i] = img
             }
         }
     }
 
-    func setAvatar(index: Int, image: NSImage, originalPath: String) {
-        let targetURL = avatarDir.appendingPathComponent("avatar\(index).png")
-        saveImage(image: image, url: targetURL)
+    func setAvatar(index: Int, image: NSImage) {
+        let target = avatarURL(index: index)
+        savePNG(image: image, to: target)
         avatars[index] = image
+        if index == currentIndex { objectWillChange.send() }
     }
 
     var currentImage: NSImage {
         avatars[currentIndex] ?? placeholder(index: currentIndex)
+    }
+
+    // MARK: - Helpers
+
+    private func avatarURL(index: Int) -> URL {
+        avatarDir.appendingPathComponent("avatar\(index).png")
+    }
+
+    private func savePNG(image: NSImage, to url: URL) {
+        guard
+            let tiff = image.tiffRepresentation,
+            let rep = NSBitmapImageRep(data: tiff),
+            let data = rep.representation(using: .png, properties: [:])
+        else { return }
+        try? data.write(to: url, options: .atomic)
     }
 
     private func placeholder(index: Int) -> NSImage {
@@ -64,12 +81,5 @@ class AvatarModel: ObservableObject {
         text.draw(in: rect, withAttributes: attrs)
         img.unlockFocus()
         return img
-    }
-
-    private func saveImage(image: NSImage, url: URL) {
-        guard let tiff = image.tiffRepresentation,
-              let rep = NSBitmapImageRep(data: tiff),
-              let data = rep.representation(using: .png, properties: [:]) else { return }
-        try? data.write(to: url)
     }
 }

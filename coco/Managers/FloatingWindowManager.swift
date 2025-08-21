@@ -1,14 +1,16 @@
 import SwiftUI
 import AppKit
 
-class FloatingWindowManager {
+final class FloatingWindowManager {
     static let shared = FloatingWindowManager()
     private weak var window: NSWindow?
 
-    func setupWindow<Content: View>(rootView: Content, alwaysOnTop: Bool) {
-        if let win = NSApp.windows.first {
+    /// 在 SwiftUI 窗口创建后进行一次配置
+    func setupWindow(alwaysOnTop: Bool) {
+        DispatchQueue.main.async {
+            guard let win = NSApp.windows.first else { return }
             self.window = win
-            configure(win, alwaysOnTop: alwaysOnTop)
+            self.configure(win, alwaysOnTop: alwaysOnTop)
         }
     }
 
@@ -18,11 +20,14 @@ class FloatingWindowManager {
 
     private func configure(_ window: NSWindow, alwaysOnTop: Bool) {
         window.setContentSize(NSSize(width: 100, height: 100))
-        window.styleMask = [.borderless]
+        window.styleMask = [.borderless]              // 无边框
         window.isOpaque = false
-        window.backgroundColor = .clear
-        window.level = alwaysOnTop ? .floating : .normal
+        window.backgroundColor = .clear               // 让圆形裁剪真正透明
         window.hasShadow = true
+        window.level = alwaysOnTop ? .floating : .normal
         window.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
+
+        // 让点击能直接作用到我们的无边框窗口
+        window.ignoresMouseEvents = false
     }
 }
