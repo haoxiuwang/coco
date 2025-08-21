@@ -1,17 +1,17 @@
-//
-//  cocoApp.swift
-//  coco
-//
-//  Created by Xuanyu on 2025-08-20.
-//
-
 import SwiftUI
 
 @main
-struct cocoApp: App {
+struct FloatingAvatarApp: App {
+    @StateObject private var model = AvatarModel()
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            AvatarView(model: model)
+                .onAppear {
+                    FloatingWindowManager.shared.setupWindow(rootView: AvatarView(model: model),
+                                                             alwaysOnTop: model.alwaysOnTop)
+                }
         }
+        .windowStyle(HiddenTitleBarWindowStyle())
     }
 }
