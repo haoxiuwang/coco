@@ -31,7 +31,7 @@ final class AvatarModel: ObservableObject {
         }
 
         // 启动时从沙盒加载 4 张头像
-        for i in 0..<4 {
+        for i in 0..<5 {
             let url = avatarURL(index: i)
             if fm.fileExists(atPath: url.path),
                let img = NSImage(contentsOf: url) {

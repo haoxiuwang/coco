@@ -25,14 +25,14 @@ struct AvatarView: View {
         .frame(width: 100, height: 100)
         .contextMenu {
             Section("显示头像") {
-                ForEach(0..<4, id: \.self) { i in
+                ForEach(0..<5, id: \.self) { i in
                     Button(model.currentIndex == i ? "头像 \(i+1) ✓" : "头像 \(i+1)") {
                         model.currentIndex = i
                     }
                 }
             }
             Divider()
-            ForEach(0..<4, id: \.self) { i in
+            ForEach(0..<5, id: \.self) { i in
                 Button("设置头像 \(i+1)…") {
                     pickImage { url, image in
                         if let url, let image {
