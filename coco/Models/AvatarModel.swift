@@ -2,7 +2,7 @@ import SwiftUI
 import AppKit
 
 final class AvatarModel: ObservableObject {
-    @Published var avatars: [NSImage?] = Array(repeating: nil, count: 4)
+    @Published var avatars: [NSImage?] = Array(repeating: nil, count: 5)
 
     @Published var currentIndex: Int = UserDefaults.standard.integer(forKey: "floating.currentIndex") {
         didSet { UserDefaults.standard.set(currentIndex, forKey: "floating.currentIndex") }
@@ -33,10 +33,12 @@ final class AvatarModel: ObservableObject {
         // 启动时从沙盒加载 4 张头像
         for i in 0..<5 {
             let url = avatarURL(index: i)
-            if fm.fileExists(atPath: url.path),
-               let img = NSImage(contentsOf: url) {
-                avatars[i] = img
+            guard fm.fileExists(atPath: url.path),
+                  let img = NSImage(contentsOf: url) else {
+                continue   // just skip this index if not valid
             }
+
+            avatars[i] = img
         }
     }
 

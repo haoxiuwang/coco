@@ -16,6 +16,11 @@
 			path = coco;
 			sourceTree = "<group>";
 		};
+		BAB449AC2E571443006BFB90 /* Managers */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Managers;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -32,6 +37,7 @@
 		BAB449702E56D902006BFB90 = {
 			isa = PBXGroup;
 			children = (
+				BAB449AC2E571443006BFB90 /* Managers */,
 				BAB4497B2E56D902006BFB90 /* coco */,
 				BAB4497A2E56D902006BFB90 /* Products */,
 			);
@@ -62,6 +68,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				BAB4497B2E56D902006BFB90 /* coco */,
+				BAB449AC2E571443006BFB90 /* Managers */,
 			);
 			name = coco;
 			packageProductDependencies = (
